@@ -1,0 +1,22 @@
+From: Lucas Nussbaum <lucas@debian.org>
+Date: Sat, 8 Jul 2017 20:39:34 +0200
+Subject: no-git-in-gemspec
+
+Replace calls to 'git' in gemspec by explicit lists of files
+---
+ rest-client.gemspec | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+--- a/rest-client.gemspec
++++ b/rest-client.gemspec
+@@ -11,8 +11,8 @@ Gem::Specification.new do |s|
+   s.email = 'discuss@rest-client.groups.io'
+   s.executables = ['restclient']
+   s.extra_rdoc_files = ['README.md', 'history.md']
+-  s.files = `git ls-files -z`.split("\0")
+-  s.test_files = `git ls-files -z spec/`.split("\0")
++  s.files = Dir.glob('bin/**') + Dir.glob('lib/**')
++  s.test_files = Dir.glob('spec/**')
+   s.homepage = 'https://github.com/rest-client/rest-client'
+   s.summary = 'Simple HTTP and REST client for Ruby, inspired by microframework syntax for specifying actions.'
+ 

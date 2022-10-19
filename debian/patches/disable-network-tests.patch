@@ -1,0 +1,213 @@
+From: Matthias Klose <doko@ubuntu.com>
+From: Steve Langasek <steve.langasek@ubuntu.com>
+Last-Update: 2017-08-29
+Bug-Debian: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=818459
+Bug-Debian: https://bugs.debian.org/873576
+Forwarded: no
+
+--- a/spec/integration/request_spec.rb
++++ b/spec/integration/request_spec.rb
+@@ -10,96 +10,7 @@ describe RestClient::Request do
+   end
+ 
+   describe "ssl verification" do
+-    it "is successful with the correct ca_file" do
+-      request = RestClient::Request.new(
+-        :method => :get,
+-        :url => 'https://www.mozilla.org',
+-        :ssl_ca_file => File.join(File.dirname(__FILE__), "certs", "digicert.crt")
+-      )
+-      expect { request.execute }.to_not raise_error
+-    end
+-
+-    it "is successful with the correct ca_path" do
+-      request = RestClient::Request.new(
+-        :method => :get,
+-        :url => 'https://www.mozilla.org',
+-        :ssl_ca_path => File.join(File.dirname(__FILE__), "capath_digicert")
+-      )
+-      expect { request.execute }.to_not raise_error
+-    end
+-
+-    # TODO: deprecate and remove RestClient::SSLCertificateNotVerified and just
+-    # pass through OpenSSL::SSL::SSLError directly. See note in
+-    # lib/restclient/request.rb.
+-    #
+-    # On OS X, this test fails since Apple has patched OpenSSL to always fall
+-    # back on the system CA store.
+-    it "is unsuccessful with an incorrect ca_file", :unless => RestClient::Platform.mac_mri? do
+-      request = RestClient::Request.new(
+-        :method => :get,
+-        :url => 'https://www.mozilla.org',
+-        :ssl_ca_file => File.join(File.dirname(__FILE__), "certs", "verisign.crt")
+-      )
+-      expect { request.execute }.to raise_error(RestClient::SSLCertificateNotVerified)
+-    end
+-
+-    # On OS X, this test fails since Apple has patched OpenSSL to always fall
+-    # back on the system CA store.
+-    it "is unsuccessful with an incorrect ca_path", :unless => RestClient::Platform.mac_mri? do
+-      request = RestClient::Request.new(
+-        :method => :get,
+-        :url => 'https://www.mozilla.org',
+-        :ssl_ca_path => File.join(File.dirname(__FILE__), "capath_verisign")
+-      )
+-      expect { request.execute }.to raise_error(RestClient::SSLCertificateNotVerified)
+-    end
+-
+-    it "is successful using the default system cert store" do
+-      request = RestClient::Request.new(
+-        :method => :get,
+-        :url => 'https://www.mozilla.org',
+-        :verify_ssl => true,
+-      )
+-      expect {request.execute }.to_not raise_error
+-    end
+-
+-    it "executes the verify_callback" do
+-      ran_callback = false
+-      request = RestClient::Request.new(
+-        :method => :get,
+-        :url => 'https://www.mozilla.org',
+-        :verify_ssl => true,
+-        :ssl_verify_callback => lambda { |preverify_ok, store_ctx|
+-          ran_callback = true
+-          preverify_ok
+-        },
+-      )
+-      expect {request.execute }.to_not raise_error
+-      expect(ran_callback).to eq(true)
+-    end
+-
+-    it "fails verification when the callback returns false",
+-       :unless => RestClient::Platform.mac_mri? do
+-      request = RestClient::Request.new(
+-        :method => :get,
+-        :url => 'https://www.mozilla.org',
+-        :verify_ssl => true,
+-        :ssl_verify_callback => lambda { |preverify_ok, store_ctx| false },
+-      )
+-      expect { request.execute }.to raise_error(RestClient::SSLCertificateNotVerified)
+-    end
+-
+-    it "succeeds verification when the callback returns true",
+-       :unless => RestClient::Platform.mac_mri? do
+-      request = RestClient::Request.new(
+-        :method => :get,
+-        :url => 'https://www.mozilla.org',
+-        :verify_ssl => true,
+-        :ssl_ca_file => File.join(File.dirname(__FILE__), "certs", "verisign.crt"),
+-        :ssl_verify_callback => lambda { |preverify_ok, store_ctx| true },
+-      )
+-      expect { request.execute }.to_not raise_error
+-    end
++    # all removed; accessing the network
+   end
+ 
+   describe "timeouts" do
+@@ -113,15 +24,6 @@ describe RestClient::Request do
+         raise_error(RestClient::Exceptions::OpenTimeout))
+     end
+ 
+-    it "raises ReadTimeout when it hits a read timeout via :read_timeout" do
+-      request = RestClient::Request.new(
+-        :method => :get,
+-        :url => 'https://www.mozilla.org',
+-        :read_timeout => 1e-10,
+-      )
+-      expect { request.execute }.to(
+-        raise_error(RestClient::Exceptions::ReadTimeout))
+-    end
+   end
+ 
+ end
+--- a/spec/integration/httpbin_spec.rb
++++ b/spec/integration/httpbin_spec.rb
+@@ -42,87 +42,5 @@ describe RestClient::Request do
+   end
+ 
+   describe '.execute' do
+-    it 'sends a user agent' do
+-      data = execute_httpbin_json('user-agent', method: :get)
+-      expect(data['user-agent']).to match(/rest-client/)
+-    end
+-
+-    it 'receives cookies on 302' do
+-      expect {
+-        execute_httpbin('cookies/set?foo=bar', method: :get, max_redirects: 0)
+-      }.to raise_error(RestClient::Found) { |ex|
+-        expect(ex.http_code).to eq 302
+-        expect(ex.response.cookies['foo']).to eq 'bar'
+-      }
+-    end
+-
+-    it 'passes along cookies through 302' do
+-      data = execute_httpbin_json('cookies/set?foo=bar', method: :get)
+-      expect(data).to have_key('cookies')
+-      expect(data['cookies']['foo']).to eq 'bar'
+-    end
+-
+-    it 'handles quote wrapped cookies' do
+-      expect {
+-        execute_httpbin('cookies/set?foo=' + CGI.escape('"bar:baz"'),
+-                        method: :get, max_redirects: 0)
+-      }.to raise_error(RestClient::Found) { |ex|
+-        expect(ex.http_code).to eq 302
+-        expect(ex.response.cookies['foo']).to eq '"bar:baz"'
+-      }
+-    end
+-
+-    it 'sends basic auth' do
+-      user = 'user'
+-      pass = 'pass'
+-
+-      data = execute_httpbin_json("basic-auth/#{user}/#{pass}", method: :get, user: user, password: pass)
+-      expect(data).to eq({'authenticated' => true, 'user' => user})
+-
+-      expect {
+-        execute_httpbin_json("basic-auth/#{user}/#{pass}", method: :get, user: user, password: 'badpass')
+-      }.to raise_error(RestClient::Unauthorized) { |ex|
+-        expect(ex.http_code).to eq 401
+-      }
+-    end
+-
+-    it 'handles gzipped/deflated responses' do
+-      [['gzip', 'gzipped'], ['deflate', 'deflated']].each do |encoding, var|
+-        raw = execute_httpbin(encoding, method: :get)
+-
+-        begin
+-          data = JSON.parse(raw)
+-        rescue StandardError
+-          puts "Failed to parse: " + raw.inspect
+-          raise
+-        end
+-
+-        expect(data['method']).to eq 'GET'
+-        expect(data.fetch(var)).to be true
+-      end
+-    end
+-
+-    it 'does not uncompress response when accept-encoding is set' do
+-      # == gzip ==
+-      raw = execute_httpbin('gzip', method: :get, headers: {accept_encoding: 'gzip, deflate'})
+-
+-      # check for gzip magic number
+-      expect(raw.body).to start_with("\x1F\x8B".b)
+-
+-      decoded = Zlib::GzipReader.new(StringIO.new(raw.body)).read
+-      parsed = JSON.parse(decoded)
+-
+-      expect(parsed['method']).to eq 'GET'
+-      expect(parsed.fetch('gzipped')).to be true
+-
+-      # == delate ==
+-      raw = execute_httpbin('deflate', method: :get, headers: {accept_encoding: 'gzip, deflate'})
+-
+-      decoded = Zlib::Inflate.new.inflate(raw.body)
+-      parsed = JSON.parse(decoded)
+-
+-      expect(parsed['method']).to eq 'GET'
+-      expect(parsed.fetch('deflated')).to be true
+-    end
+   end
+ end

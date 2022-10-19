@@ -1,0 +1,3 @@
+disable-network-tests.patch
+no-git-in-gemspec.patch
+proxy-proof-tests.patch

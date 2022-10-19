@@ -1,0 +1,28 @@
+Description: Fix tests to pass cleanly when http_proxy is set in the env
+ An autopkgtest environment may have a global proxy set for access to the
+ Internet.  Our tests should not fail if this is the case.  Mock the
+ environment so that we're not inadvertently testing the wrong thing.
+Author: Steve Langasek <steve.langasek@ubuntu.com>
+
+--- a/spec/unit/request_spec.rb
++++ b/spec/unit/request_spec.rb
+@@ -556,6 +556,9 @@ describe RestClient::Request, :include_h
+     end
+ 
+     it "creates a non-proxy class if a proxy url is not given" do
++      allow(ENV).to receive(:[]).with("HTTP_PROXY").and_return(nil)
++      allow(ENV).to receive(:[]).with("http_proxy").and_return(nil)
++      allow(ENV).to receive(:[]).with("NETRC").and_return(nil)
+       expect(@proxy_req.net_http_object('host', 80).proxy?).to be_falsey
+     end
+ 
+@@ -569,6 +572,9 @@ describe RestClient::Request, :include_h
+     end
+ 
+     it "sets proxy on a per-request basis" do
++      allow(ENV).to receive(:[]).with("HTTP_PROXY").and_return(nil)
++      allow(ENV).to receive(:[]).with("http_proxy").and_return(nil)
++      allow(ENV).to receive(:[]).with("NETRC").and_return(nil)
+       expect(@proxy_req.net_http_object('some', 80).proxy?).to be_falsey
+ 
+       req = RestClient::Request.new(:method => :put, :url => 'http://some/resource', :payload => 'payload', :proxy => 'http://example.com')
