@@ -1,3 +1,25 @@
+ruby-rest-client (2.1.0-3) unstable; urgency=medium
+
+  * add patch 0005-fix-expectations-for-rspec-3.12.patch. Closes: #1027086
+
+ -- Lucas Nussbaum <lucas@debian.org>  Thu, 29 Dec 2022 18:02:51 +0100
+
+ruby-rest-client (2.1.0-2) unstable; urgency=medium
+
+  [ Debian Janitor ]
+  * Remove constraints unnecessary since buster:
+    + Build-Depends: Drop versioned constraint on ruby-http-cookie,
+      ruby-mime-types, ruby-netrc and ruby-webmock.
+    + ruby-rest-client: Drop versioned constraint on ruby-http-cookie,
+      ruby-mime-types and ruby-netrc in Depends.
+
+  [ Lucas Nussbaum ]
+  * Add patch 0004-Relax-version-requirement-on-http-accept.patch
+  * debian/control: relax version requirement on http-accept
+  * Refresh packaging using dh-make-ruby -w
+
+ -- Lucas Nussbaum <lucas@debian.org>  Mon, 26 Dec 2022 16:17:31 +0100
+
 ruby-rest-client (2.1.0-1) unstable; urgency=medium
 
   [ Utkarsh Gupta ]

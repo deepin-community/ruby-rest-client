@@ -1,3 +1,5 @@
 disable-network-tests.patch
 no-git-in-gemspec.patch
 proxy-proof-tests.patch
+0004-Relax-version-requirement-on-http-accept.patch
+0005-fix-expectations-for-rspec-3.12.patch
