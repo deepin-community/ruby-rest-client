@@ -1,0 +1,21 @@
+From: Lucas Nussbaum <lucas@debian.org>
+Date: Mon, 26 Dec 2022 15:19:17 +0100
+Subject: Relax version requirement on http-accept
+
+---
+ rest-client.gemspec | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/rest-client.gemspec b/rest-client.gemspec
+index 925f204..665b5d4 100644
+--- a/rest-client.gemspec
++++ b/rest-client.gemspec
+@@ -23,7 +23,7 @@ Gem::Specification.new do |s|
+   s.add_development_dependency('rdoc', '>= 2.4.2', '< 6.0')
+   s.add_development_dependency('rubocop', '~> 0.49')
+ 
+-  s.add_dependency('http-accept', '>= 1.7.0', '< 2.0')
++  s.add_dependency('http-accept', '>= 1.7.0')
+   s.add_dependency('http-cookie', '>= 1.0.2', '< 2.0')
+   s.add_dependency('mime-types', '>= 1.16', '< 4.0')
+   s.add_dependency('netrc', '~> 0.8')

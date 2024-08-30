@@ -1,0 +1,71 @@
+From: Lucas Nussbaum <lucas@debian.org>
+Date: Thu, 29 Dec 2022 17:49:09 +0100
+Subject: fix expectations for rspec 3.12
+
+---
+ spec/unit/request_spec.rb  |  2 +-
+ spec/unit/resource_spec.rb | 14 +++++++-------
+ 2 files changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/spec/unit/request_spec.rb b/spec/unit/request_spec.rb
+index a597108..5a11969 100644
+--- a/spec/unit/request_spec.rb
++++ b/spec/unit/request_spec.rb
+@@ -505,7 +505,7 @@ describe RestClient::Request, :include_helpers do
+ 
+   it "class method execute wraps constructor" do
+     req = double("rest request")
+-    expect(RestClient::Request).to receive(:new).with(1 => 2).and_return(req)
++    expect(RestClient::Request).to receive(:new).with({1 => 2}).and_return(req)
+     expect(req).to receive(:execute)
+     RestClient::Request.execute(1 => 2)
+   end
+diff --git a/spec/unit/resource_spec.rb b/spec/unit/resource_spec.rb
+index 676e95d..fae5fa5 100644
+--- a/spec/unit/resource_spec.rb
++++ b/spec/unit/resource_spec.rb
+@@ -7,37 +7,37 @@ describe RestClient::Resource do
+ 
+   context "Resource delegation" do
+     it "GET" do
+-      expect(RestClient::Request).to receive(:execute).with(:method => :get, :url => 'http://some/resource', :headers => {'X-Something' => '1'}, :user => 'jane', :password => 'mypass', :log => nil)
++      expect(RestClient::Request).to receive(:execute).with({:method => :get, :url => 'http://some/resource', :headers => {'X-Something' => '1'}, :user => 'jane', :password => 'mypass', :log => nil})
+       @resource.get
+     end
+ 
+     it "HEAD" do
+-      expect(RestClient::Request).to receive(:execute).with(:method => :head, :url => 'http://some/resource', :headers => {'X-Something' => '1'}, :user => 'jane', :password => 'mypass', :log => nil)
++      expect(RestClient::Request).to receive(:execute).with({:method => :head, :url => 'http://some/resource', :headers => {'X-Something' => '1'}, :user => 'jane', :password => 'mypass', :log => nil})
+       @resource.head
+     end
+ 
+     it "POST" do
+-      expect(RestClient::Request).to receive(:execute).with(:method => :post, :url => 'http://some/resource', :payload => 'abc', :headers => {:content_type => 'image/jpg', 'X-Something' => '1'}, :user => 'jane', :password => 'mypass', :log => nil)
++      expect(RestClient::Request).to receive(:execute).with({:method => :post, :url => 'http://some/resource', :payload => 'abc', :headers => {:content_type => 'image/jpg', 'X-Something' => '1'}, :user => 'jane', :password => 'mypass', :log => nil})
+       @resource.post 'abc', :content_type => 'image/jpg'
+     end
+ 
+     it "PUT" do
+-      expect(RestClient::Request).to receive(:execute).with(:method => :put, :url => 'http://some/resource', :payload => 'abc', :headers => {:content_type => 'image/jpg', 'X-Something' => '1'}, :user => 'jane', :password => 'mypass', :log => nil)
++      expect(RestClient::Request).to receive(:execute).with({:method => :put, :url => 'http://some/resource', :payload => 'abc', :headers => {:content_type => 'image/jpg', 'X-Something' => '1'}, :user => 'jane', :password => 'mypass', :log => nil})
+       @resource.put 'abc', :content_type => 'image/jpg'
+     end
+ 
+     it "PATCH" do
+-      expect(RestClient::Request).to receive(:execute).with(:method => :patch, :url => 'http://some/resource', :payload => 'abc', :headers => {:content_type => 'image/jpg', 'X-Something' => '1'}, :user => 'jane', :password => 'mypass', :log => nil)
++      expect(RestClient::Request).to receive(:execute).with({:method => :patch, :url => 'http://some/resource', :payload => 'abc', :headers => {:content_type => 'image/jpg', 'X-Something' => '1'}, :user => 'jane', :password => 'mypass', :log => nil})
+       @resource.patch 'abc', :content_type => 'image/jpg'
+     end
+ 
+     it "DELETE" do
+-      expect(RestClient::Request).to receive(:execute).with(:method => :delete, :url => 'http://some/resource', :headers => {'X-Something' => '1'}, :user => 'jane', :password => 'mypass', :log => nil)
++      expect(RestClient::Request).to receive(:execute).with({:method => :delete, :url => 'http://some/resource', :headers => {'X-Something' => '1'}, :user => 'jane', :password => 'mypass', :log => nil})
+       @resource.delete
+     end
+ 
+     it "overrides resource headers" do
+-      expect(RestClient::Request).to receive(:execute).with(:method => :get, :url => 'http://some/resource', :headers => {'X-Something' => '2'}, :user => 'jane', :password => 'mypass', :log => nil)
++      expect(RestClient::Request).to receive(:execute).with({:method => :get, :url => 'http://some/resource', :headers => {'X-Something' => '2'}, :user => 'jane', :password => 'mypass', :log => nil})
+       @resource.get 'X-Something' => '2'
+     end
+   end

@@ -7,34 +7,26 @@ Build-Depends: debhelper-compat (= 13),
                gem2deb (>= 1),
                rake,
                ruby,
-               ruby-http-accept (<< 2.0),
                ruby-http-accept (>= 1.7.0),
                ruby-http-cookie (<< 2.0),
-               ruby-http-cookie (>= 1.0.2),
+               ruby-http-cookie,
                ruby-mime-types (<< 4.0),
-               ruby-mime-types (>= 1.16),
-               ruby-netrc (>= 0.8),
+               ruby-mime-types,
+               ruby-netrc,
                ruby-rspec,
-               ruby-webmock (>= 3.0)
-Standards-Version: 4.5.1
+               ruby-webmock
+Standards-Version: 4.6.1
 Vcs-Git: https://salsa.debian.org/ruby-team/ruby-rest-client.git
 Vcs-Browser: https://salsa.debian.org/ruby-team/ruby-rest-client
 Homepage: https://github.com/rest-client/rest-client
 Testsuite: autopkgtest-pkg-ruby
-XS-Ruby-Versions: all
 Rules-Requires-Root: no
 
 Package: ruby-rest-client
 Architecture: all
-XB-Ruby-Versions: ${ruby:Versions}
 Depends: ${misc:Depends},
          ${ruby:Depends},
-         ${shlibs:Depends},
-         ruby-http-cookie (<< 2.0),
-         ruby-http-cookie (>= 1.0.2),
-         ruby-mime-types (<< 4.0),
-         ruby-mime-types (>= 1.16),
-         ruby-netrc (>= 0.8)
+         ${shlibs:Depends}
 Description: simple REST client for Ruby
  A simple HTTP and REST client for Ruby, inspired by the Sinatra microframework
  style of specifying actions: get, put, post, delete.
